@@ -1,4 +1,7 @@
-//CONFIGURAÇÃO DA API OPEN-METEO (SEM CHAVE NECESSÁRIA!) 
+//CONFIGURAÇÃO DA API OPEN-METEO (SEM CHAVE NECESSÁRIA!)
+const GEOCODING_API = "https://geocoding-api.open-meteo.com/v1/search";
+const REVERSE_GEOCODING_API = "https://geocoding-api.open-meteo.com/v1/reverse";
+const WEATHER_API = "https://api.open-meteo.com/v1/forecast"; 
 // ===== ELEMENTOS DO DOM =====
 // ===== VARIÁVEIS GLOBAIS =====
 // ===== INICIALIZAÇÃO =====
