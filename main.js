@@ -1,0 +1,18 @@
+//CONFIGURAÇÃO DA API OPEN-METEO (SEM CHAVE NECESSÁRIA!) 
+// ===== ELEMENTOS DO DOM =====
+// ===== VARIÁVEIS GLOBAIS =====
+// ===== INICIALIZAÇÃO =====
+// Carregar previsão padrão (se função existir)
+// = FUNÇÃO PARA BUSCAR COORDENADAS DE UMA CIDADE 
+// ===== FUNÇÃO PARA BUSCAR PREVISÃO DO TEMPO =====
+// ===== FUNÇÃO PARA RENDERIZAR A PREVISÃO =====
+// ===== FUNÇÃO PARA CRIAR CARD DE PREVISÃO =====
+// = FUNÇÃO PARA MAPEAR CÓDIGO DO CLIMA PARA EMOJI =
+// ===== FUNÇÃO PARA OBTER DESCRIÇÃO DO CLIMA =====
+// ===== FUNÇÃO PARA OBTER NOME DO DIA =====
+// ===== FUNÇÃO PARA FORMATAR DATA =====
+// ===== FUNÇÃO PARA CAPITALIZAR TEXTO =====
+// ===== FUNÇÃO PARA LIDAR COM A BUSCA =====
+// ===== FUNÇÕES DE CONTROLE DE INTERFACE =====
+// = FUNÇÃO PARA INICIALIZAR BOTÕES DE COMPARTILHAMENTO =
+// fechar ao clicar fora (simples)
