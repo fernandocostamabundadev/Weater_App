@@ -542,6 +542,17 @@ body {
   border: 0;
 }
 /* ===== SEÇÃO DE PREVISÃO ===== */
+.forecast-section {
+  margin-bottom: 40px;
+  animation: fadeInUp 1s ease;
+}
+
+.forecast-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  padding: 10px;
+}
 /* ===== CARDS DE PREVISÃO ===== */
 /* ===== BOTÕES DE COMPARTILHAMENTO ===== */
 /* ======= CONTAINER DOS BOTÕES ======= */
