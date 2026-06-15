@@ -818,7 +818,54 @@ body {
 }
 
 /* ======= RESPONSIVIDADE ======= */
+@media (max-width: 768px) {
+  .share-buttons {
+    gap: 10px;
+    padding: 10px 14px;
+  }
+  .share-buttons a,
+  .share-buttons button {
+    min-width: 100px;
+    font-size: 13px;
+    padding: 10px 12px;
+  }
+  .share-meta {
+    display: none;
+  }
+}
+
+@media (max-width: 420px) {
+  .share-buttons {
+    flex-direction: column;
+    width: 100%;
+    padding: 12px;
+    gap: 10px;
+  }
+  .share-buttons a,
+  .share-buttons button {
+    width: 100%;
+    max-width: 360px;
+    justify-content: center;
+  }
+}
+
 /* ===== RODAPÉ ===== */
+.footer {
+  text-align: center;
+  padding: 30px 20px;
+  color: var(--text-light);
+  margin-top: 50px;
+}
+
+.footer p {
+  margin: 5px 0;
+  font-size: 0.95rem;
+}
+
+.footer-credits {
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
 /* ===== ANIMAÇÕES GERAIS ===== */
 /* ===== UTILITÁRIOS ===== */
 /* ===== RESPONSIVIDADE ===== */
