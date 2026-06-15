@@ -764,8 +764,59 @@ body {
   display: inline-block;
 }
 /* ======= ESTILOS ESPECÍFICOS DE CADA BOTÃO ======= */
+.share-buttons a.facebook,
+.share-buttons button.facebook {
+  background: linear-gradient(135deg, #1877f2 0%, #2851a3 100%);
+}
+
+.share-buttons a.whatsapp,
+.share-buttons button.whatsapp {
+  background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
+}
+
+.share-buttons a.instagram,
+.share-buttons button.instagram {
+  background: linear-gradient(135deg, #feda75 0%, #d62976 50%, #8134af 100%);
+  background-size: 200% 200%;
+  animation: instaShift 6s ease-in-out infinite;
+}
+
+@keyframes instaShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.share-buttons button.copy {
+  background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+}
+
 /* ======= EFEITOS DE HOVER ======= */
+.share-buttons a:hover,
+.share-buttons button:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 18px 40px rgba(2, 6, 23, 0.18);
+  opacity: 0.98;
+}
 /* ======= LABELS AUXILIARES ======= */
+.share-label {
+  display: inline-block;
+}
+.share-meta {
+  display: block;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.85);
+  opacity: 0.85;
+  margin-top: 2px;
+  font-weight: 500;
+}
+
 /* ======= RESPONSIVIDADE ======= */
 /* ===== RODAPÉ ===== */
 /* ===== ANIMAÇÕES GERAIS ===== */
