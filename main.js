@@ -395,7 +395,285 @@ async function fetchWeather(location) {
   }
 }
 // = FUNÇÃO PARA BUSCAR COORDENADAS DE UMA CIDADE 
-// ===== FUNÇÃO PARA BUSCAR PREVISÃO DO TEMPO =====
+// ===== FUNÇÃO PARA BUSCAR PREVISÃO DO TEMPO =====async function fetchWeather(location) {
+  try {
+    // Mostrar loading
+    showLoading();
+    currentLocation = location;
+
+    // 1. Buscar coordenadas da cidade
+    const coords = await getCoordinates(location);
+
+    // 2. Buscar previsão do tempo
+    const weatherUrl = `${WEATHER_API}?latitude=${coords.latitude}&longitude=${coords.longitude}&daily=temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,weathercode,windspeed_10m_max,relative_humidity_2m_max,uv_index_max,precipitation_probability_max,sunrise,sunset,surface_pressure_max&timezone=auto&forecast_days=5`;
+
+    const weatherResponse = await fetch(weatherUrl);
+
+    if (!weatherResponse.ok) {
+      throw new Error(
+        "Erro ao buscar previsão do tempo. Tente novamente mais tarde.",
+      );
+    }
+
+    const weatherData = await weatherResponse.json();
+
+    // 3. Renderizar a previsão
+    renderForecast(weatherData, coords);
+    addRecentLocation(currentLocation);
+  } catch (error) {
+    console.error("Erro ao buscar previsão:", error);
+    showError(`❌ ${error.message}`);
+  } finally {
+    hideLoading();
+  }
+}
+
+// ===== FUNÇÃO PARA RENDERIZAR A PREVISÃO =====
+function renderForecast(data, coords) {
+  // Limpar mensagens de erro anteriores
+  hideError();
+
+  // Atualizar informações da localização
+  const locationName = coords.admin1
+    ? `${coords.name}, ${coords.admin1}, ${coords.country}`
+    : `${coords.name}, ${coords.country}`;
+
+  cityName.textContent = locationName;
+  currentDate.textContent = formatDate(new Date());
+  currentLocation = locationName;
+  locationInfo.classList.remove("hidden");
+  updateFavoriteButton();
+
+  // Limpar cards anteriores
+  forecastCards.innerHTML = "";
+
+  // Criar cards para cada dia
+  data.daily.time.forEach((date, index) => {
+    const forecast = {
+      date: new Date(date),
+      temp_max: data.daily.temperature_2m_max[index],
+      temp_min: data.daily.temperature_2m_min[index],
+      feels_max: data.daily.apparent_temperature_max[index],
+      feels_min: data.daily.apparent_temperature_min[index],
+      weatherCode: data.daily.weathercode[index],
+      windSpeed: data.daily.windspeed_10m_max[index],
+      humidity: data.daily.relative_humidity_2m_max[index],
+      uvIndex: data.daily.uv_index_max
+        ? data.daily.uv_index_max[index]
+        : undefined,
+      precipProb: data.daily.precipitation_probability_max
+        ? data.daily.precipitation_probability_max[index]
+        : undefined,
+      sunrise: data.daily.sunrise[index],
+      sunset: data.daily.sunset[index],
+      pressure: data.daily.surface_pressure_max
+        ? data.daily.surface_pressure_max[index]
+        : undefined,
+    };
+
+    const card = createForecastCard(forecast, index);
+    forecastCards.appendChild(card);
+  });
+
+  // Mostrar seções
+  forecastSection.classList.remove("hidden");
+  shareSection.classList.remove("hidden");
+}
+
+// ===== FUNÇÃO PARA CRIAR CARD DE PREVISÃO =====
+function createForecastCard(forecast, index) {
+  const card = document.createElement("div");
+  card.className = "forecast-card";
+
+  const emoji = mapWeatherToEmoji(forecast.weatherCode);
+  const dayName = getDayName(forecast.date, index);
+  const description = getWeatherDescription(forecast.weatherCode);
+  const feelsLikeText =
+    forecast.feels_max && forecast.feels_min
+      ? `${Math.round(forecast.feels_min)}° / ${Math.round(forecast.feels_max)}°`
+      : "—";
+  const uvText = forecast.uvIndex !== undefined ? `${forecast.uvIndex}` : "—";
+  const precipText =
+    forecast.precipProb !== undefined
+      ? `${Math.round(forecast.precipProb)}%`
+      : "—";
+  const pressureText =
+    forecast.pressure !== undefined
+      ? `${Math.round(forecast.pressure)} hPa`
+      : "—";
+
+  card.tabIndex = 0;
+  card.setAttribute("role", "article");
+  card.setAttribute(
+    "aria-label",
+    `${dayName}: ${description}, máxima ${Math.round(forecast.temp_max)}°C, mínima ${Math.round(forecast.temp_min)}°C`,
+  );
+
+  card.innerHTML = `
+        <div class="card-date">${dayName}</div>
+        <div class="card-emoji">${emoji}</div>
+        <div class="card-description">${description}</div>
+        <div class="card-temp">
+            <div class="temp-max">
+                <span class="temp-label">Máx</span>
+                <span class="temp-value">${Math.round(forecast.temp_max)}°C</span>
+            </div>
+            <div class="temp-min">
+                <span class="temp-label">Mín</span>
+                <span class="temp-value">${Math.round(forecast.temp_min)}°C</span>
+            </div>
+        </div>
+        <div class="card-details">
+            <div class="detail-item">
+                <span class="detail-icon">💨</span>
+                <span>${forecast.windSpeed.toFixed(1)} km/h</span>
+            </div>
+            <div class="detail-item">
+                <span class="detail-icon">💧</span>
+                <span>${Math.round(forecast.humidity)}%</span>
+            </div>
+        </div>
+        <div class="card-extra">
+            <div class="extra-item">
+                <span class="extra-label">Sensação</span>
+                <span>${feelsLikeText}</span>
+            </div>
+            <div class="extra-item">
+                <span class="extra-label">UV</span>
+                <span>${uvText}</span>
+            </div>
+            <div class="extra-item">
+                <span class="extra-label">Chuva</span>
+                <span>${precipText}</span>
+            </div>
+            <div class="extra-item">
+                <span class="extra-label">Pressão</span>
+                <span>${pressureText}</span>
+            </div>
+        </div>
+        <div class="card-times">
+            <div class="time-item">
+                <span>Nascer</span>
+                <span>${formatTime(forecast.sunrise)}</span>
+            </div>
+            <div class="time-item">
+                <span>Pôr</span>
+                <span>${formatTime(forecast.sunset)}</span>
+            </div>
+        </div>
+    `;
+
+  return card;
+}
+
+// ===== FUNÇÃO PARA MAPEAR CÓDIGO DO CLIMA PARA EMOJI =====
+function mapWeatherToEmoji(weatherCode) {
+  // Códigos baseados na WMO Weather interpretation codes
+  // Referência: https://open-meteo.com/en/docs
+
+  if (weatherCode === 0) {
+    return "☀️";
+  } else if (weatherCode === 1) {
+    return "🌤️";
+  } else if (weatherCode === 2) {
+    return "⛅";
+  } else if (weatherCode === 3) {
+    return "☁️";
+  } else if (weatherCode >= 45 && weatherCode <= 48) {
+    return "🌫️";
+  } else if (weatherCode >= 51 && weatherCode <= 57) {
+    return "🌧️";
+  } else if (weatherCode >= 61 && weatherCode <= 67) {
+    return "🌧️";
+  } else if (weatherCode >= 71 && weatherCode <= 77) {
+    return "❄️";
+  } else if (weatherCode >= 80 && weatherCode <= 82) {
+    return "🌧️";
+  } else if (weatherCode >= 85 && weatherCode <= 86) {
+    return "❄️";
+  } else if (weatherCode >= 95 && weatherCode <= 99) {
+    return "⚡";
+  } else {
+    return "🌤️";
+  }
+}
+
+// ===== FUNÇÃO PARA OBTER DESCRIÇÃO DO CLIMA =====
+function getWeatherDescription(weatherCode) {
+  const descriptions = {
+    0: "Céu limpo",
+    1: "Principalmente limpo",
+    2: "Parcialmente nublado",
+    3: "Nublado",
+    45: "Neblina",
+    48: "Névoa",
+    51: "Chuvisco leve",
+    53: "Chuvisco moderado",
+    55: "Chuvisco intenso",
+    56: "Chuvisco congelante leve",
+    57: "Chuvisco congelante intenso",
+    61: "Chuva leve",
+    63: "Chuva moderada",
+    65: "Chuva forte",
+    66: "Chuva congelante leve",
+    67: "Chuva congelante forte",
+    71: "Neve fraca",
+    73: "Neve moderada",
+    75: "Neve intensa",
+    77: "Grãos de neve",
+    80: "Pancadas de chuva leves",
+    81: "Pancadas de chuva moderadas",
+    82: "Pancadas de chuva fortes",
+    85: "Pancadas de neve leves",
+    86: "Pancadas de neve fortes",
+    95: "Tempestade",
+    96: "Tempestade com granizo leve",
+    99: "Tempestade com granizo forte",
+  };
+
+  return descriptions[weatherCode] || "Condições variadas";
+}
+
+// ===== FUNÇÃO PARA OBTER NOME DO DIA =====
+function getDayName(date, index) {
+  const days = [
+    "Domingo",
+    "Segunda",
+    "Terça",
+    "Quarta",
+    "Quinta",
+    "Sexta",
+    "Sábado",
+  ];
+
+  if (index === 0) {
+    return "Hoje";
+  } else if (index === 1) {
+    return "Amanhã";
+  } else {
+    return days[date.getDay()];
+  }
+}
+
+// ===== FUNÇÃO PARA FORMATAR DATA =====
+function formatDate(date) {
+  const options = {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  };
+  return date.toLocaleDateString("pt-BR", options);
+}
+
+function formatTime(value) {
+  if (!value) return "--:--";
+  const date = new Date(value);
+  return date.toLocaleTimeString("pt-BR", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
 // ===== FUNÇÃO PARA RENDERIZAR A PREVISÃO =====
 // ===== FUNÇÃO PARA CRIAR CARD DE PREVISÃO =====
 // = FUNÇÃO PARA MAPEAR CÓDIGO DO CLIMA PARA EMOJI =
