@@ -554,6 +554,132 @@ body {
   padding: 10px;
 }
 /* ===== CARDS DE PREVISÃO ===== */
+.forecast-card {
+  background: var(--card-bg);
+  border-radius: 20px;
+  padding: 25px;
+  box-shadow: 0 4px 15px var(--shadow);
+  transition: all 0.3s ease;
+  animation: slideIn 0.6s ease forwards;
+  opacity: 0;
+}
+
+.forecast-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px var(--shadow-hover);
+}
+
+.forecast-card:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.forecast-card:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.forecast-card:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.forecast-card:nth-child(4) {
+  animation-delay: 0.4s;
+}
+.forecast-card:nth-child(5) {
+  animation-delay: 0.5s;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card-date {
+  font-weight: 600;
+  color: var(--primary-blue);
+  margin-bottom: 10px;
+  font-size: 1rem;
+}
+
+.card-emoji {
+  font-size: 4rem;
+  margin: 15px 0;
+  animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.card-description {
+  color: var(--text-dark);
+  font-weight: 500;
+  margin-bottom: 15px;
+  font-size: 0.95rem;
+}
+
+.card-temp {
+  display: flex;
+  justify-content: space-around;
+  margin: 15px 0;
+  padding: 10px 0;
+  border-top: 2px solid rgba(33, 150, 243, 0.2);
+  border-bottom: 2px solid rgba(33, 150, 243, 0.2);
+}
+
+.temp-max,
+.temp-min {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.temp-label {
+  font-size: 0.8rem;
+  color: #666;
+  margin-bottom: 5px;
+}
+
+.temp-value {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.temp-max .temp-value {
+  color: #ff5722;
+}
+
+.temp-min .temp-value {
+  color: var(--primary-blue);
+}
+
+.card-details {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 15px;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.detail-icon {
+  font-size: 1.3rem;
+}
 /* ===== BOTÕES DE COMPARTILHAMENTO ===== */
 /* ======= CONTAINER DOS BOTÕES ======= */
 /* ======= BOTÕES INDIVIDUAIS ======= */
