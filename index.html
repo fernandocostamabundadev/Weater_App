@@ -36,8 +36,51 @@
         </div>
       </header>
     <div>
-    <!--  cabeçalho -->
     <!--  barra de busca -->
+    <div class="search-section">
+        <div class="search-box">
+          <label for="locationInput" class="visually-hidden"
+            >Cidade, estado ou CEP</label
+          >
+          <input
+            type="text"
+            id="locationInput"
+            class="search-input"
+            placeholder="Digite a cidade (ex: São Paulo, SP, Brasil)"
+            autocomplete="off"
+            list="locationSuggestions"
+          />
+          <datalist id="locationSuggestions"></datalist>
+          <button id="searchBtn" class="search-btn" type="button">
+            <span class="search-icon">🔍</span>
+            Buscar
+          </button>
+          <button
+            id="geoBtn"
+            class="geo-btn"
+            type="button"
+            aria-label="Buscar previsão na minha localização"
+          >
+            📍
+          </button>
+        </div>
+      </div>
+      <div
+        id="recentSection"
+        class="recent-section hidden"
+        aria-label="Pesquisas recentes"
+      >
+        <h2>Pesquisas recentes</h2>
+        <div id="recentButtons" class="history-buttons"></div>
+      </div>
+      <div
+        id="favoritesSection"
+        class="favorites-section hidden"
+        aria-label="Locais favoritos"
+      >
+        <h2>Locais favoritos</h2>
+        <div id="favoriteButtons" class="history-buttons"></div>
+      </div>
     <!--  spinner de carregamento -->
     <!--  mensagem de erro -->
     <!--  informações da localização -->
