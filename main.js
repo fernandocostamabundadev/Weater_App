@@ -3,7 +3,37 @@ const GEOCODING_API = "https://geocoding-api.open-meteo.com/v1/search";
 const REVERSE_GEOCODING_API = "https://geocoding-api.open-meteo.com/v1/reverse";
 const WEATHER_API = "https://api.open-meteo.com/v1/forecast"; 
 // ===== ELEMENTOS DO DOM =====
+let locationInput,
+  searchBtn,
+  loading,
+  errorMessage,
+  locationInfo,
+  cityName,
+  currentDate,
+  forecastSection,
+  forecastCards,
+  shareSection,
+  shareFacebook,
+  shareWhatsapp,
+  copyLink,
+  shareInstagram,
+  closeShare,
+  geoBtn,
+  locationSuggestions,
+  recentSection,
+  recentButtons,
+  favoritesSection,
+  favoriteButtons,
+  favoriteBtn;
 // ===== VARIÁVEIS GLOBAIS =====
+let currentLocation = "";
+let recentLocations = [];
+let favoriteLocations = [];
+const RECENT_KEY = "weather_recent_locations";
+const FAVORITES_KEY = "weather_favorite_locations";
+const MAX_RECENT = 5;
+const AUTOCOMPLETE_DELAY = 300;
+let autocompleteTimer;
 // ===== INICIALIZAÇÃO =====
 // Carregar previsão padrão (se função existir)
 // = FUNÇÃO PARA BUSCAR COORDENADAS DE UMA CIDADE 
