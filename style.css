@@ -711,8 +711,58 @@ body {
 }
 
 /* ======= CONTAINER DOS BOTÕES ======= */
+.share-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding: 12px 18px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.04),
+    rgba(255, 255, 255, 0.02)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(8px);
+  border-radius: 14px;
+  box-shadow: 0 8px 30px rgba(9, 30, 66, 0.12);
+  width: fit-content;
+  margin: 8px auto 0;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+
 /* ======= BOTÕES INDIVIDUAIS ======= */
+.share-buttons a,
+.share-buttons button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    opacity 180ms ease;
+  text-decoration: none;
+  min-width: 120px;
+  box-shadow: 0 6px 18px rgba(2, 6, 23, 0.12);
+}
 /* icon sizing */
+.share-buttons .share-icon svg,
+.share-buttons i {
+  width: 18px;
+  height: 18px;
+  display: inline-block;
+}
 /* ======= ESTILOS ESPECÍFICOS DE CADA BOTÃO ======= */
 /* ======= EFEITOS DE HOVER ======= */
 /* ======= LABELS AUXILIARES ======= */
