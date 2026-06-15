@@ -155,6 +155,245 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // Carregar previsão padrão (se função existir)
+async function getCoordinates(location) {
+  const url = `${GEOCODING_API}?name=${encodeURIComponent(location)}&count=1&language=pt&format=json`;
+
+  const response = await fetch(url);
+  const data = await response.json();
+
+  if (!data.results || data.results.length === 0) {
+    throw new Error(
+      "Local não encontrado. Verifique o nome da cidade e tente novamente.",
+    );
+  }
+
+  return {
+    latitude: data.results[0].latitude,
+    longitude: data.results[0].longitude,
+    name: data.results[0].name,
+    country: data.results[0].country,
+    admin1: data.results[0].admin1 || "",
+  };
+}
+
+async function reverseGeocode(latitude, longitude) {
+  const url = `${REVERSE_GEOCODING_API}?latitude=${latitude}&longitude=${longitude}&count=1&language=pt&format=json`;
+  const response = await fetch(url);
+  const data = await response.json();
+
+  if (!data.results || data.results.length === 0) {
+    throw new Error(
+      "Não foi possível determinar a localização por coordenadas.",
+    );
+  }
+
+  const place = data.results[0];
+  return `${place.name}${place.admin1 ? `, ${place.admin1}` : ``}, ${place.country}`;
+}
+
+async function populateLocationSuggestions(query) {
+  if (!locationSuggestions) return;
+  try {
+    const url = `${GEOCODING_API}?name=${encodeURIComponent(query)}&count=6&language=pt&format=json`;
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (!data.results) {
+      locationSuggestions.innerHTML = "";
+      return;
+    }
+
+    locationSuggestions.innerHTML = data.results
+      .map((item) => {
+        const label = item.admin1
+          ? `${item.name}, ${item.admin1}, ${item.country}`
+          : `${item.name}, ${item.country}`;
+        return `<option value="${label}"></option>`;
+      })
+      .join("");
+  } catch (error) {
+    console.warn("Autocomplete não disponível:", error);
+  }
+}
+
+function loadAppState() {
+  try {
+    const recentData = window.localStorage.getItem(RECENT_KEY);
+    const favoritesData = window.localStorage.getItem(FAVORITES_KEY);
+    recentLocations = recentData ? JSON.parse(recentData) : [];
+    favoriteLocations = favoritesData ? JSON.parse(favoritesData) : [];
+  } catch (error) {
+    console.warn("Erro ao carregar estado do app:", error);
+    recentLocations = [];
+    favoriteLocations = [];
+  }
+  renderAppState();
+}
+
+function saveAppState() {
+  window.localStorage.setItem(RECENT_KEY, JSON.stringify(recentLocations));
+  window.localStorage.setItem(FAVORITES_KEY, JSON.stringify(favoriteLocations));
+}
+
+function renderAppState() {
+  renderRecentLocations();
+  renderFavoriteLocations();
+}
+
+function renderRecentLocations() {
+  if (!recentButtons || !recentSection) return;
+  if (recentLocations.length === 0) {
+    recentSection.classList.add("hidden");
+    return;
+  }
+  recentSection.classList.remove("hidden");
+  recentButtons.innerHTML = recentLocations
+    .map(
+      (location) => `
+        <button type="button" class="history-btn" data-location="${location}">
+          ${location}
+        </button>
+      `,
+    )
+    .join("");
+  recentButtons.querySelectorAll(".history-btn").forEach((button) => {
+    button.addEventListener("click", () => {
+      locationInput.value = button.dataset.location;
+      fetchWeather(button.dataset.location);
+    });
+  });
+}
+
+function renderFavoriteLocations() {
+  if (!favoriteButtons || !favoritesSection) return;
+  if (favoriteLocations.length === 0) {
+    favoritesSection.classList.add("hidden");
+    return;
+  }
+  favoritesSection.classList.remove("hidden");
+  favoriteButtons.innerHTML = favoriteLocations
+    .map(
+      (location) => `
+        <button type="button" class="history-btn favorite-item" data-location="${location}">
+          ${location}
+        </button>
+      `,
+    )
+    .join("");
+  favoriteButtons.querySelectorAll(".history-btn").forEach((button) => {
+    button.addEventListener("click", () => {
+      locationInput.value = button.dataset.location;
+      fetchWeather(button.dataset.location);
+    });
+  });
+}
+
+function addRecentLocation(location) {
+  if (!location) return;
+  const normalized = location.trim();
+  recentLocations = recentLocations.filter((item) => item !== normalized);
+  recentLocations.unshift(normalized);
+  if (recentLocations.length > MAX_RECENT) recentLocations.pop();
+  saveAppState();
+  renderRecentLocations();
+}
+
+function isFavoriteLocation(location) {
+  return favoriteLocations.includes(location);
+}
+
+function updateFavoriteButton() {
+  if (!favoriteBtn) return;
+  if (!currentLocation) {
+    favoriteBtn.disabled = true;
+    favoriteBtn.setAttribute("aria-pressed", "false");
+    favoriteBtn.textContent = "⭐ Adicionar aos favoritos";
+    return;
+  }
+  favoriteBtn.disabled = false;
+  const active = isFavoriteLocation(currentLocation);
+  favoriteBtn.setAttribute("aria-pressed", active.toString());
+  favoriteBtn.textContent = active
+    ? "❌ Remover dos favoritos"
+    : "⭐ Adicionar aos favoritos";
+}
+
+function toggleFavoriteLocation() {
+  if (!currentLocation) {
+    showError("Selecione uma cidade antes de adicionar aos favoritos.");
+    return;
+  }
+  const normalized = currentLocation.trim();
+  if (isFavoriteLocation(normalized)) {
+    favoriteLocations = favoriteLocations.filter((item) => item !== normalized);
+  } else {
+    favoriteLocations.unshift(normalized);
+  }
+  saveAppState();
+  renderFavoriteLocations();
+  updateFavoriteButton();
+}
+
+function requestGeolocation() {
+  if (!navigator.geolocation) {
+    showError("Geolocalização não suportada neste navegador.");
+    return;
+  }
+  showLoading();
+  navigator.geolocation.getCurrentPosition(
+    async (position) => {
+      try {
+        const latitude = position.coords.latitude;
+        const longitude = position.coords.longitude;
+        const locationName = await reverseGeocode(latitude, longitude);
+        locationInput.value = locationName;
+        await fetchWeather(locationName);
+      } catch (geocodeError) {
+        console.error(geocodeError);
+        showError("Não foi possível obter sua localização. Tente novamente.");
+      }
+    },
+    (error) => {
+      console.error("Erro de geolocalização:", error);
+      showError("Permissão para localização negada ou indisponível.");
+    },
+    { enableHighAccuracy: true, timeout: 10000 },
+  );
+}
+
+// ===== FUNÇÃO PARA BUSCAR PREVISÃO DO TEMPO =====
+async function fetchWeather(location) {
+  try {
+    // Mostrar loading
+    showLoading();
+    currentLocation = location;
+
+    // 1. Buscar coordenadas da cidade
+    const coords = await getCoordinates(location);
+
+    // 2. Buscar previsão do tempo
+    const weatherUrl = `${WEATHER_API}?latitude=${coords.latitude}&longitude=${coords.longitude}&daily=temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,weathercode,windspeed_10m_max,relative_humidity_2m_max,uv_index_max,precipitation_probability_max,sunrise,sunset,surface_pressure_max&timezone=auto&forecast_days=5`;
+
+    const weatherResponse = await fetch(weatherUrl);
+
+    if (!weatherResponse.ok) {
+      throw new Error(
+        "Erro ao buscar previsão do tempo. Tente novamente mais tarde.",
+      );
+    }
+
+    const weatherData = await weatherResponse.json();
+
+    // 3. Renderizar a previsão
+    renderForecast(weatherData, coords);
+    addRecentLocation(currentLocation);
+  } catch (error) {
+    console.error("Erro ao buscar previsão:", error);
+    showError(`❌ ${error.message}`);
+  } finally {
+    hideLoading();
+  }
+}
 // = FUNÇÃO PARA BUSCAR COORDENADAS DE UMA CIDADE 
 // ===== FUNÇÃO PARA BUSCAR PREVISÃO DO TEMPO =====
 // ===== FUNÇÃO PARA RENDERIZAR A PREVISÃO =====
