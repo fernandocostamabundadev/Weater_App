@@ -674,14 +674,192 @@ function formatTime(value) {
     minute: "2-digit",
   });
 }
-// ===== FUNÇÃO PARA RENDERIZAR A PREVISÃO =====
-// ===== FUNÇÃO PARA CRIAR CARD DE PREVISÃO =====
-// = FUNÇÃO PARA MAPEAR CÓDIGO DO CLIMA PARA EMOJI =
-// ===== FUNÇÃO PARA OBTER DESCRIÇÃO DO CLIMA =====
-// ===== FUNÇÃO PARA OBTER NOME DO DIA =====
-// ===== FUNÇÃO PARA FORMATAR DATA =====
 // ===== FUNÇÃO PARA CAPITALIZAR TEXTO =====
+function capitalize(text) {
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
 // ===== FUNÇÃO PARA LIDAR COM A BUSCA =====
+function handleSearch() {
+  const location = locationInput.value.trim();
+
+  if (!location) {
+    showError("⚠️ Por favor, digite uma localização.");
+    return;
+  }
+
+  fetchWeather(location);
+}
+
 // ===== FUNÇÕES DE CONTROLE DE INTERFACE =====
-// = FUNÇÃO PARA INICIALIZAR BOTÕES DE COMPARTILHAMENTO =
-// fechar ao clicar fora (simples)
+function showLoading() {
+  loading.classList.remove("hidden");
+  forecastSection.classList.add("hidden");
+  shareSection.classList.add("hidden");
+  locationInfo.classList.add("hidden");
+  errorMessage.classList.add("hidden");
+}
+
+function hideLoading() {
+  loading.classList.add("hidden");
+}
+
+function showError(message) {
+  errorMessage.textContent = message;
+  errorMessage.classList.remove("hidden");
+  forecastSection.classList.add("hidden");
+  shareSection.classList.add("hidden");
+  locationInfo.classList.add("hidden");
+}
+
+function hideError() {
+  errorMessage.classList.add("hidden");
+}
+
+// ===== FUNÇÃO PARA INICIALIZAR BOTÕES DE COMPARTILHAMENTO =====
+function initShareButtons() {
+  if (!shareSection) return;
+  
+  function showShare() {
+    shareSection.classList.remove("hidden");
+    shareSection.setAttribute("aria-hidden", "false");
+  }
+
+  function hideShare() {
+    shareSection.classList.add("hidden");
+    shareSection.setAttribute("aria-hidden", "true");
+  }
+
+  function buildShareUrl() {
+    const city =
+      currentLocation || (cityName && cityName.textContent) || "localidade";
+    const dateText =
+      (currentDate && currentDate.textContent) ||
+      new Date().toLocaleDateString();
+    // gerar URL relativa com parâmetros (aberta no navegador)
+    const base = `${location.protocol}//${location.host}${location.pathname}`;
+    return `${base}?city=${encodeURIComponent(city)}&date=${encodeURIComponent(dateText)}`;
+  }
+
+  function buildShareMessage() {
+    const city =
+      currentLocation || (cityName && cityName.textContent) || "localidade";
+    const dateText =
+      (currentDate && currentDate.textContent) ||
+      new Date().toLocaleDateString();
+    const url = buildShareUrl();
+    return `Previsão do tempo para ${city} — ${dateText}\nVeja mais: ${url}`;
+  }
+
+  async function copyToClipboard(text) {
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        ta.style.position = "fixed";
+        ta.style.left = "-9999px";
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+      }
+      flashMessage("Link copiado!");
+    } catch (err) {
+      console.error("Erro ao copiar:", err);
+      flashMessage("Não foi possível copiar");
+    }
+  }
+
+  function flashMessage(msg) {
+    const el = document.createElement("div");
+    el.textContent = msg;
+    el.style.position = "absolute";
+    el.style.bottom = "-46px";
+    el.style.left = "50%";
+    el.style.transform = "translateX(-50%)";
+    el.style.background = "rgba(0,0,0,0.8)";
+    el.style.color = "#fff";
+    el.style.padding = "8px 12px";
+    el.style.borderRadius = "10px";
+    el.style.fontSize = "0.9rem";
+    el.style.zIndex = "10001";
+    shareSection.appendChild(el);
+    setTimeout(() => el.remove(), 1700);
+  }
+
+  // handlers
+  if (shareWhatsapp) {
+    shareWhatsapp.addEventListener("click", (e) => {
+      e.preventDefault();
+      const msg = encodeURIComponent(buildShareMessage());
+      const url = `https://api.whatsapp.com/send?text=${msg}`;
+      window.open(url, "_blank");
+    });
+  }
+
+  if (shareFacebook) {
+    shareFacebook.addEventListener("click", (e) => {
+      e.preventDefault();
+      const u = encodeURIComponent(buildShareUrl());
+      const url = `https://www.facebook.com/sharer/sharer.php?u=${u}`;
+      window.open(url, "_blank", "noopener");
+    });
+  }
+
+  if (shareInstagram) {
+    shareInstagram.addEventListener("click", (e) => {
+      e.preventDefault();
+      // Instagram não fornece sharer de texto via web — abrir perfil/instagram
+      window.open("https://www.instagram.com/", "_blank", "noopener");
+    });
+  }
+
+  if (copyLink) {
+    copyLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      copyToClipboard(buildShareUrl());
+    });
+  }
+
+  if (closeShare) {
+    closeShare.addEventListener("click", () => hideShare());
+  }
+
+  // fechar ao clicar fora (simples)
+  document.addEventListener("click", (ev) => {
+    if (!shareSection) return;
+    if (!shareSection.classList.contains("hidden")) {
+      // se clicar fora do modal (shareSection), fechar
+      const rect = shareSection.getBoundingClientRect();
+      const x = ev.clientX,
+        y = ev.clientY;
+      if (x < rect.left || x > rect.right || y < rect.top || y > rect.bottom) {
+        hideShare();
+      }
+    }
+  });
+
+  // expor funções para uso externo (se precisar abrir o modal de outro lugar)
+  window.showShareModal = showShare;
+  window.hideShareModal = hideShare;
+}
+
+// ===== INFORMAÇÃO SOBRE A API =====
+console.log(`
+✅ Weather Forecast Day - Usando Open-Meteo API
+
+📍 API: Open-Meteo (100% gratuita)
+🌍 Cobertura: Mundial (incluindo Brasil)
+📊 Limite: 10.000 chamadas/dia
+🔑 Chave: Não necessária
+📖 Docs: https://open-meteo.com/
+
+Benefícios:
+✓ Sem necessidade de cadastro
+✓ Sem chave de API
+✓ Alta precisão
+✓ Open-source
+✓ Previsão de até 16 dias
+`);
