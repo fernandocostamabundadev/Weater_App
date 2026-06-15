@@ -1,7 +1,8 @@
-//CONFIGURAÇÃO DA API OPEN-METEO (SEM CHAVE NECESSÁRIA!)
+// ===== CONFIGURAÇÃO DA API OPEN-METEO (SEM CHAVE NECESSÁRIA!) =====
 const GEOCODING_API = "https://geocoding-api.open-meteo.com/v1/search";
 const REVERSE_GEOCODING_API = "https://geocoding-api.open-meteo.com/v1/reverse";
-const WEATHER_API = "https://api.open-meteo.com/v1/forecast"; 
+const WEATHER_API = "https://api.open-meteo.com/v1/forecast";
+
 // ===== ELEMENTOS DO DOM =====
 let locationInput,
   searchBtn,
@@ -25,6 +26,7 @@ let locationInput,
   favoritesSection,
   favoriteButtons,
   favoriteBtn;
+
 // ===== VARIÁVEIS GLOBAIS =====
 let currentLocation = "";
 let recentLocations = [];
@@ -34,6 +36,7 @@ const FAVORITES_KEY = "weather_favorite_locations";
 const MAX_RECENT = 5;
 const AUTOCOMPLETE_DELAY = 300;
 let autocompleteTimer;
+
 // ===== INICIALIZAÇÃO =====
 document.addEventListener("DOMContentLoaded", () => {
   console.log("DOMContentLoaded — iniciando app");
@@ -154,7 +157,7 @@ document.addEventListener("DOMContentLoaded", () => {
   console.log("App inicializado com sucesso");
 });
 
-// Carregar previsão padrão (se função existir)
+// ===== FUNÇÃO PARA BUSCAR COORDENADAS DE UMA CIDADE =====
 async function getCoordinates(location) {
   const url = `${GEOCODING_API}?name=${encodeURIComponent(location)}&count=1&language=pt&format=json`;
 
@@ -363,39 +366,6 @@ function requestGeolocation() {
 
 // ===== FUNÇÃO PARA BUSCAR PREVISÃO DO TEMPO =====
 async function fetchWeather(location) {
-  try {
-    // Mostrar loading
-    showLoading();
-    currentLocation = location;
-
-    // 1. Buscar coordenadas da cidade
-    const coords = await getCoordinates(location);
-
-    // 2. Buscar previsão do tempo
-    const weatherUrl = `${WEATHER_API}?latitude=${coords.latitude}&longitude=${coords.longitude}&daily=temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,weathercode,windspeed_10m_max,relative_humidity_2m_max,uv_index_max,precipitation_probability_max,sunrise,sunset,surface_pressure_max&timezone=auto&forecast_days=5`;
-
-    const weatherResponse = await fetch(weatherUrl);
-
-    if (!weatherResponse.ok) {
-      throw new Error(
-        "Erro ao buscar previsão do tempo. Tente novamente mais tarde.",
-      );
-    }
-
-    const weatherData = await weatherResponse.json();
-
-    // 3. Renderizar a previsão
-    renderForecast(weatherData, coords);
-    addRecentLocation(currentLocation);
-  } catch (error) {
-    console.error("Erro ao buscar previsão:", error);
-    showError(`❌ ${error.message}`);
-  } finally {
-    hideLoading();
-  }
-}
-// = FUNÇÃO PARA BUSCAR COORDENADAS DE UMA CIDADE 
-// ===== FUNÇÃO PARA BUSCAR PREVISÃO DO TEMPO =====async function fetchWeather(location) {
   try {
     // Mostrar loading
     showLoading();
@@ -674,6 +644,7 @@ function formatTime(value) {
     minute: "2-digit",
   });
 }
+
 // ===== FUNÇÃO PARA CAPITALIZAR TEXTO =====
 function capitalize(text) {
   return text.charAt(0).toUpperCase() + text.slice(1);
