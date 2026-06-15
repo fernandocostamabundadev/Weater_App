@@ -334,6 +334,31 @@ body {
 }
 
 /* ===== MENSAGEM DE ERRO ===== */
+.error-message {
+  background: rgba(244, 67, 54, 0.95);
+  color: var(--text-light);
+  padding: 20px;
+  border-radius: 15px;
+  text-align: center;
+  margin: 20px auto;
+  max-width: 600px;
+  box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
+  animation: shake 0.5s ease;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-10px);
+  }
+  75% {
+    transform: translateX(10px);
+  }
+}
+
 /* ===== INFORMAÇÕES DA LOCALIZAÇÃO ===== */
 /* ===== SEÇÃO DE PREVISÃO ===== */
 /* ===== CARDS DE PREVISÃO ===== */
