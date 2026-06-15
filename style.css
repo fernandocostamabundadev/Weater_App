@@ -137,6 +137,41 @@ body {
 }
 
 /* Animações de movimento das nuvens */
+@keyframes moveCloud1 {
+  0% {
+    left: -250px;
+  }
+  100% {
+    left: 110%;
+  }
+}
+
+@keyframes moveCloud2 {
+  0% {
+    left: -200px;
+  }
+  100% {
+    left: 110%;
+  }
+}
+
+@keyframes moveCloud3 {
+  0% {
+    left: -220px;
+  }
+  100% {
+    left: 110%;
+  }
+}
+
+@keyframes moveCloud4 {
+  0% {
+    left: -270px;
+  }
+  100% {
+    left: 110%;
+  }
+}
 /* ===== CONTAINER PRINCIPAL ===== */
 /* ===== CABEÇALHO ===== */
 /* ===== BARRA DE BUSCA ===== */
