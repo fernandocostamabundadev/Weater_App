@@ -3,7 +3,7 @@
 # 🌤️ Weather Forecast Day — README
 
 **Um site moderno, responsivo e animado** (HTML + CSS + JavaScript puro) que mostra a **previsão dos próximos 5 dias** para qualquer local informado (cidade, estado, país ou CEP), com **fundo de nuvens em movimento**, **cards elegantes** e **botões de compartilhamento**.
-Desenvolvido por **Dev Pamela M.S**.
+Desenvolvido por **Dev Fernando Costa Mabunda**.
 
 ---
 
@@ -44,7 +44,7 @@ weather-App/
 * Seção com **cards dos próximos 5 dias**
 * `<div class="clouds"></div>` para **nuvens animadas**
 * **Botões de compartilhamento** (Facebook, WhatsApp, Copiar Link)
-* **Rodapé**: “Desenvolvido por **Dev Pamela M.S**”
+* **Rodapé**: “Desenvolvido por **Dev Fernando Costa Mabunda**”
 * **Comentários HTML** explicativos `<!-- início: ... -->`
 
 ---
@@ -205,12 +205,7 @@ Sinta-se livre para usar e aprimorar.
 
 ## 👩‍💻 Créditos
 
-**Desenvolvido por Dev Pamela M.S** — *“Sua visão, nossa tecnologia.”*
-
-* 🌐 **Site/Portfólio**: devpamelams.com.br
-* ✉️ **E-mail**: [eng.pamelams@gmail.com](mailto:eng.pamelams@gmail.com)
-* 📱 **WhatsApp**: (11) 94583-5660 / (11) 91477-8911
-* 📸 **Instagram**: @devpamelams
+**Desenvolvido por Dev Fernando Costa Mabunda** — *“Sua visão, nossa tecnologia.”*
 
 ---
 
